@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function lazyWithRetry(dynamicImportFn: () => any) {
@@ -12,9 +12,15 @@ function lazyWithRetry(dynamicImportFn: () => any) {
 
 export const routes = {
   root: '/',
+  login: '/login',
+  project: '/project',
 } as const;
 
 export const router = createBrowserRouter([
+  {
+    path: routes.login,
+    Component: lazyWithRetry(() => import('@/pages/login')),
+  },
   {
     path: routes.root,
     Component: lazyWithRetry(() => import('@/layouts/default-layout')),
@@ -24,8 +30,12 @@ export const router = createBrowserRouter([
         Component: lazyWithRetry(() => import('@/pages/home')),
       },
       {
+        path: `${routes.project}/:id/:page?`,
+        Component: lazyWithRetry(() => import('@/pages/project')),
+      },
+      {
         path: '*',
-        Component: lazyWithRetry(() => import('@/pages/home')),
+        element: <Navigate to={routes.root} />,
       },
     ],
   },

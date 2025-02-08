@@ -1,18 +1,23 @@
+import { useAppKitAccount } from '@reown/appkit/react';
 import { Suspense, memo } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 
 import { PageLoader } from '@/components/page-loader/page-loader';
-import Providers from '@/providers/Providers';
+import { routes } from '@/router';
 
 const DefaultLayout = memo(() => {
+  const { status } = useAppKitAccount();
+
   return (
-    <Providers>
-      <div className="font-quicksand relative">
-        <Suspense fallback={<PageLoader screen />}>
+    <div className="font-quicksand relative">
+      <Suspense fallback={<PageLoader screen />}>
+        {status === 'connected' ? (
           <Outlet />
-        </Suspense>
-      </div>
-    </Providers>
+        ) : (
+          <Navigate to={routes.login} replace />
+        )}
+      </Suspense>
+    </div>
   );
 });
 DefaultLayout.displayName = 'DefaultLayout';

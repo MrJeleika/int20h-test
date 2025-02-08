@@ -44,7 +44,6 @@
       }
     ],
 
-    "@typescript-eslint/consistent-type-imports": "error",
     "no-inline-styles/no-inline-styles": "error",
     "prettier/prettier": [
       "error",
