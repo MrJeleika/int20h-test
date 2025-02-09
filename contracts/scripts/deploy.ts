@@ -2,13 +2,17 @@ import { deployments, ethers, getNamedAccounts, upgrades } from 'hardhat';
 import { abi as TransparentUpgradeableProxyABI } from '@openzeppelin/contracts/build/contracts/TransparentUpgradeableProxy.json';
 
 async function main() {
-  const Lock = await ethers.getContractFactory('Lock');
-  const lock = await upgrades.deployProxy(Lock, ['0x0'], {
-    unsafeAllow: ['constructor'],
+  const [deployer] = await ethers.getSigners();
+  console.log(
+    'Deploying contracts with the account: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    deployer.address,
+  );
+  const main = await deployments.deploy('Main', {
+    from: deployer.address,
   });
 
-  await lock.waitForDeployment();
-  console.log('Box deployed to:', await lock.getAddress());
+  //await main.waitForDeployment();
+  console.log('Box deployed to:', main.address);
 }
 
 main().catch((error) => {
