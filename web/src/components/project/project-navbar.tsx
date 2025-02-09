@@ -1,5 +1,9 @@
-import { ReactNode } from 'react';
+import { UseAppKitAccountReturn } from '@reown/appkit';
+import { ChevronLeft } from 'lucide-react';
+import { ReactNode, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import { Avatar, AvatarFallback } from '../ui/avatar';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,6 +16,7 @@ import { Separator } from '../ui/separator';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -22,6 +27,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '../ui/sidebar';
+
+import { routes } from '@/router';
 
 type NavElement = {
   id: string;
@@ -34,6 +41,8 @@ type ProjectNavbarProps = {
   children: ReactNode;
   projectName: string;
   activeElementId: string;
+  accountInfo: UseAppKitAccountReturn;
+  openProfile: () => void;
   setActivePage: (id: string) => void;
 };
 
@@ -42,14 +51,29 @@ const ProjectNavbar = ({
   children,
   projectName,
   activeElementId,
+  accountInfo,
   setActivePage,
+  openProfile,
 }: ProjectNavbarProps) => {
+  const navigate = useNavigate();
+
+  const handleClickBack = useCallback(() => navigate(routes.root), [navigate]);
+
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar collapsible="icon">
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>{projectName}</SidebarGroupLabel>
+            <SidebarGroupLabel className="mb-1">
+              <SidebarMenuButton
+                className="m-1 flex h-8 w-8 items-center justify-center"
+                onClick={handleClickBack}
+              >
+                <ChevronLeft />
+              </SidebarMenuButton>
+              <Separator orientation="vertical" className="mr-2 h-4" />
+              {projectName}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {elements.map((item) => (
@@ -71,6 +95,27 @@ const ProjectNavbar = ({
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
+        <SidebarFooter>
+          <SidebarMenuButton
+            size="lg"
+            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            onClick={openProfile}
+          >
+            <Avatar className="h-8 w-8 rounded-lg">
+              <AvatarFallback className="rounded-lg">P</AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">
+                {accountInfo.embeddedWalletInfo?.user?.username ??
+                  'Your profile'}
+              </span>
+              <span className="truncate text-xs">
+                {accountInfo.embeddedWalletInfo?.user?.email ??
+                  accountInfo.address}
+              </span>
+            </div>
+          </SidebarMenuButton>
+        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">

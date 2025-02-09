@@ -1,3 +1,4 @@
+import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { BookType, GraduationCap, NotebookPen } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -26,6 +27,9 @@ const elements = [
 export default function Project() {
   const { id, page } = useParams();
 
+  const accountInfo = useAppKitAccount();
+  const { open } = useAppKit();
+
   const [activePage, setActivePage] = useState(elements[0].id);
 
   const navigate = useNavigate();
@@ -48,6 +52,8 @@ export default function Project() {
       projectName="Test"
       elements={elements}
       setActivePage={setActivePage}
+      accountInfo={accountInfo}
+      openProfile={open}
     >
       <div className="flex flex-1 flex-col gap-4 p-4">
         <div className="grid auto-rows-min gap-4 md:grid-cols-3">
