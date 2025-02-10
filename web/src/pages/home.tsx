@@ -10,17 +10,18 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { CreateProject } from '@/hooks/mutations/use-create-project';
 import abi from '@/Main';
+import { useProjects } from '@/hooks/queries/use-projects';
 
-const CONTARCT_ADDRESS = import.meta.env.VITE_CONTRACT_ID;
+const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ID;
 export default function Home() {
-  ///const { data, isLoading } = useProjects();
-  const { data, isLoading } = useReadContract({
-    abi: abi,
-    functionName: 'getMyProjects',
-    address: CONTARCT_ADDRESS,
-  });
+  const { data, isLoading } = useProjects();
+  // const { data, isLoading } = useReadContract({
+  //   abi: abi,
+  //   functionName: 'getMyProjects',
+  //   address: CONTARCT_ADDRESS,
+  // });
 
-  console.log(data);
+  // console.log(data);
 
   const accountInfo = useAppKitAccount();
   const { open } = useAppKit();
@@ -43,7 +44,7 @@ export default function Home() {
     (data: CreateProject) => {
       writeCreateProject({
         abi: abi,
-        address: CONTARCT_ADDRESS,
+        address: CONTRACT_ADDRESS,
         functionName: 'createProject',
         args: [
           data.title,
