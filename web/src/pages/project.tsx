@@ -1,24 +1,22 @@
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
-import {
-  BookType,
-  GraduationCap,
-  NotebookPen,
-  UserCheck,
-  Verified,
-} from 'lucide-react';
+import { BookType, GraduationCap, NotebookPen, UserCheck } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import AddStudentDialog from '@/components/project/dialogs/add-student-dialog';
+import AddVerifierDialog from '@/components/project/dialogs/add-verifier-dialog';
+import SubmitAchievementDialog from '@/components/project/dialogs/submit-achievement-dialog';
 import ProjectNavbar from '@/components/project/project-navbar';
-import { routes } from '@/router';
+import Achievements from '@/components/project/sections/achievments';
 import Information from '@/components/project/sections/information';
+import MyAchievements from '@/components/project/sections/my-achievments';
+import Students from '@/components/project/sections/students';
+import Verifiers from '@/components/project/sections/verifiers';
+import { useAchievements } from '@/hooks/queries/use-achievements';
 import { useProject } from '@/hooks/queries/use-project';
 import { useStudents } from '@/hooks/queries/use-students';
-import Students from '@/components/project/sections/students';
-import AddStudentDialog from '@/components/project/dialogs/add-student-dialog';
-import Verifiers from '@/components/project/sections/verifiers';
-import AddVerifierDialog from '@/components/project/dialogs/add-verifier-dialog';
 import { useVerifiers } from '@/hooks/queries/use-verifiers';
+import { routes } from '@/router';
 
 const publicElements = [
   {
@@ -31,14 +29,25 @@ const publicElements = [
     title: 'Students',
     icon: <GraduationCap />,
   },
+];
+
+const studentElements = [
+  ...publicElements,
   {
-    id: 'submissions',
-    title: 'Submissions',
+    id: 'my-achievements',
+    title: 'My Achievements',
     icon: <NotebookPen />,
   },
 ];
 
-const verifierElements = [...publicElements];
+const verifierElements = [
+  ...publicElements,
+  {
+    id: 'achievements',
+    title: 'Achievements',
+    icon: <NotebookPen />,
+  },
+];
 
 const ownerElements = [
   ...verifierElements,
@@ -59,7 +68,7 @@ export default function Project() {
   const [isVerifier, setIsVerifier] = useState(false);
   const elements = useMemo(
     () =>
-      isOwner ? ownerElements : isVerifier ? verifierElements : publicElements,
+      isOwner ? ownerElements : isVerifier ? verifierElements : studentElements,
     [isOwner, isVerifier],
   );
 
@@ -67,12 +76,16 @@ export default function Project() {
 
   const [addStudentModalActive, setAddStudentModalActive] = useState(false);
   const [addVerifierModalActive, setAddVerifierModalActive] = useState(false);
+  const [addAchievementModalActive, setAddAchievementModalActive] =
+    useState(false);
 
   const navigate = useNavigate();
 
   const { data: project, isLoading: projectLoading } = useProject();
   const { data: students, isLoading: studentsLoading } = useStudents();
   const { data: verifiers, isLoading: verifiersLoading } = useVerifiers();
+  const { data: achievements, isLoading: achievementsLoading } =
+    useAchievements();
 
   useEffect(() => {
     if (page && elements.some((x) => x.id === page)) {
@@ -102,12 +115,6 @@ export default function Project() {
       openProfile={open}
     >
       <div className="flex flex-1 flex-col gap-4 p-4">
-        {/* <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-          <div className="aspect-video rounded-xl bg-muted/50" />
-          <div className="aspect-video rounded-xl bg-muted/50" />
-          <div className="aspect-video rounded-xl bg-muted/50" />
-        </div>
-        <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" /> */}
         {activePage === 'info' && (
           <Information projectData={project} loading={projectLoading} />
         )}
@@ -140,6 +147,34 @@ export default function Project() {
               setActive={setAddVerifierModalActive}
               loading={false}
               onSubmit={() => console.warn('MOCK')}
+            />
+          </>
+        )}
+        {activePage === 'achievements' && (
+          <>
+            <Achievements
+              achievements={achievements ?? []}
+              loading={achievementsLoading}
+              verify={(id) => console.warn('MOCK', id)}
+            ></Achievements>
+          </>
+        )}
+        {activePage === 'my-achievements' && (
+          <>
+            <MyAchievements
+              achievements={
+                achievements?.filter(
+                  (x) => x.student === accountInfo.address,
+                ) ?? []
+              }
+              loading={achievementsLoading}
+              setSubmitAchievementDialog={setAddAchievementModalActive}
+            ></MyAchievements>
+            <SubmitAchievementDialog
+              active={addAchievementModalActive}
+              setActive={setAddAchievementModalActive}
+              loading={false}
+              onSubmit={(desc) => console.warn('MOCK', desc)}
             />
           </>
         )}

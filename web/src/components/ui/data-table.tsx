@@ -5,6 +5,7 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  RowData,
   SortingState,
   useReactTable,
 } from '@tanstack/react-table';
@@ -25,12 +26,23 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   loading?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  callback?: (...props: any) => any;
+}
+
+declare module '@tanstack/react-table' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface TableMeta<TData extends RowData> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    callback: (...props: any) => any;
+  }
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   loading,
+  callback,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
@@ -41,6 +53,9 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
+    },
+    meta: {
+      callback: callback,
     },
   });
 
