@@ -113,7 +113,6 @@ export const getNetworkConfig = (network: Network): NetworkUserConfig => ({
   ...getBaseNetworkConfig(network),
   url: rpcUrls[network],
   saveDeployments: true,
-  accounts: [process.env.PRIVATE_KEY!],
 });
 
 export const getForkNetworkConfig = (

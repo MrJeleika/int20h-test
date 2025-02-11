@@ -30,7 +30,7 @@ const config: HardhatUserConfig = {
     ],
   },
   namedAccounts: {
-    deployer: '0x09d62F0382783416E8D78c61585Ae2A2D3260f95',
+    //deployer: '0x09d62F0382783416E8D78c61585Ae2A2D3260f95',
   },
 
   networks: {

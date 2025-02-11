@@ -9,7 +9,9 @@
     "build": "yarn clean && yarn compile",
     "test": "yarn build && hardhat test",
     "coverage": "cross-env COVERAGE=true hardhat coverage --solcoverjs ./.solcover.json",
-    "deploy": "hardhat run ./scripts/deploy.ts --network sepolia"
+    "deploy": "hardhat run ./scripts/deploy.ts --network sepolia",
+    "deployLocal": "hardhat run ./scripts/deploy.ts --network localhost",
+    "startLocalNode": "hardhat node"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
