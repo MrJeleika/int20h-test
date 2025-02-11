@@ -1,20 +1,21 @@
-import { useQuery } from '@tanstack/react-query';
+import abi from '@/lib/contractAbi';
 
-export const useVerifiers = () => {
-  return useQuery<string[]>({
-    queryKey: ['verifiers'],
-    queryFn: async () => {
-      const mock = [
-        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-        '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-      ];
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+import { useReadContract } from 'wagmi';
 
-      return mock;
+const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ID;
+
+export const useVerifiers = (sender?: string, projectId?: number) => {
+  const senderAddress = sender as `0x${string}`;
+
+  return useReadContract({
+    abi: abi,
+    functionName: 'getProjectVerifiers',
+    address: CONTRACT_ADDRESS,
+    account: senderAddress,
+    args: [BigInt(projectId ?? -1)],
+    query: {
+      enabled: projectId !== undefined,
+      select: (data) => data.map((x) => x.wallet),
     },
   });
 };

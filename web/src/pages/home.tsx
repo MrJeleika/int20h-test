@@ -1,5 +1,5 @@
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
-import { Backpack, Plus } from 'lucide-react';
+import { Backpack, Plus, RefreshCcw } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useReadContract, useWriteContract } from 'wagmi';
 
@@ -17,7 +17,7 @@ export default function Home() {
   const accountInfo = useAppKitAccount();
   const { open } = useAppKit();
 
-  const { data, loading } = useProjects(accountInfo.address);
+  const { data, loading, refetch } = useProjects(accountInfo.address);
 
   const [joinDialogActive, setJoinDialogActive] = useState(false);
   const [createDialogActive, setCreateDialogActive] = useState(false);
@@ -33,6 +33,7 @@ export default function Home() {
     isPending: isCreatePending,
     status: createStatus,
   } = useWriteContract();
+
   const createProject = useCallback(
     (data: CreateProject) => {
       writeCreateProject({
@@ -49,6 +50,7 @@ export default function Home() {
     },
     [writeCreateProject],
   );
+
   const joinProject = useCallback(
     (id: number) => {
       writeJoinProject({
@@ -64,14 +66,16 @@ export default function Home() {
   useEffect(() => {
     if (joinStatus === 'success') {
       setJoinDialogActive(false);
+      refetch();
     }
-  }, [joinStatus]);
+  }, [joinStatus, refetch]);
 
   useEffect(() => {
     if (createStatus === 'success') {
       setCreateDialogActive(false);
+      refetch();
     }
-  }, [createStatus]);
+  }, [createStatus, refetch]);
 
   return (
     <div className="mx-auto flex h-svh w-full max-w-5xl flex-col p-6">

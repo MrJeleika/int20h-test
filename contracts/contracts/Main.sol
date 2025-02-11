@@ -5,6 +5,7 @@ import "./Student.sol";
 import "./Achievement.sol";
 import "./Project.sol";
 import "./Verifier.sol";
+import "./StudentProjectInfo.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 contract Main is ERC721 {
@@ -16,6 +17,8 @@ contract Main is ERC721 {
 
     mapping(uint => address) private currentProjectMVP;
     mapping(uint => uint) private currentProjectMostAchievementsCount;
+
+    mapping(uint => address[]) private projectStudents;
 
     mapping(uint => mapping(address => bool)) private projectVerifierExists; // to check if the verifier for the project exists
     mapping(address => mapping(uint => bool)) private verifierAlreadyVerifiedAchievement; // to check if verifier has already verified the achievement
@@ -34,7 +37,7 @@ contract Main is ERC721 {
     
     uint256 private _nextTokenId;
 
-    constructor() ERC721("", "") { }
+    constructor() ERC721("AchievementCertificate", "AC") { }
 
     modifier onlyProjectOwner(uint projectId) {
         Project memory tempProject = projects[projectId];
@@ -102,6 +105,7 @@ contract Main is ERC721 {
         achievement.verifiedCount++;
         myVerifiedAchievementsCount[msg.sender]++;
         myUnverifiedAchievementsCount[msg.sender]--;
+
         verifierAlreadyVerifiedAchievement[msg.sender][achievementId] = true;
 
         address currentStudentWallet = achievement.studentWallet;
@@ -130,6 +134,8 @@ contract Main is ERC721 {
             }
         }
 
+        myUnverifiedAchievementsCount[projects[projectId].owner]++;
+
         achievements.push(Achievement(achievementCounter, description, true, msg.sender, projectId, 0, false, 0));
         myStudentAchievementsCount[msg.sender]++;
         achievementCounter++;
@@ -141,10 +147,32 @@ contract Main is ERC721 {
 
         if (students[studentAddress].isStudent == false) {
             students[studentAddress] = Student(studentAddress, true);
+            projectStudents[projectId].push(studentAddress);
         }
 
         projectStudentExists[projectId][studentAddress] = true;
         myParticipatedProjectsCount[studentAddress]++;
+    }
+
+    function getProjectStudents(uint projectId) public view returns(StudentProjectInfo[] memory) {
+        address[] memory _students = projectStudents[projectId];
+        StudentProjectInfo[] memory result = new StudentProjectInfo[](_students.length);
+
+        for (uint i = 0; i < _students.length; i++) {
+            uint verified = 0;
+            Achievement memory tempAchievement;
+            for(uint j = 0; j < achievements.length; j++) {
+                tempAchievement = achievements[j];
+
+                if (tempAchievement.studentWallet == _students[i] && tempAchievement.isVerified) {
+                    verified++;
+                }
+            }
+
+            result[i] = StudentProjectInfo(_students[i], verified);
+        }
+
+        return result;
     }
 
     function getAllProjects() public view returns(Project[] memory) {
@@ -242,6 +270,28 @@ contract Main is ERC721 {
         }
 
         return verifiedAchievements;
+    }
+
+    function getProjectVerifiers(uint projectId) public view returns(Verifier[] memory) {
+        uint count = 0;
+
+        for (uint i = 0; i < verifiers.length; i++) {
+            if (projectVerifierExists[projectId][verifiers[i].wallet]) {
+                count++;
+            }
+        }
+
+        Verifier[] memory projectVerifiers = new Verifier[](count);
+        uint index = 0;
+
+        for (uint i = 0; i < verifiers.length; i++) {
+            if (projectVerifierExists[projectId][verifiers[i].wallet]) {
+                projectVerifiers[index] = verifiers[i];
+                index++;
+            }
+        }
+
+        return projectVerifiers;
     }
 
     function getAllMyAchievementsForStudent() public view returns(Achievement[] memory) {

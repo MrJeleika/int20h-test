@@ -1,69 +1,117 @@
-import { useQuery } from '@tanstack/react-query';
+import abi from '@/lib/contractAbi';
+import { useCallback, useMemo } from 'react';
+import { useReadContract } from 'wagmi';
 
 export type Achievement = {
   id: number;
-  student: string;
+  verifiedCount: number;
+  studentWallet: string;
   isVerified: boolean;
   description: string;
+  canVerify: boolean;
+  nftTokenId?: number;
 };
 
-export const useAchievements = () => {
-  return useQuery<Achievement[]>({
-    queryKey: ['achievements'],
-    queryFn: async () => {
-      const mock = [
-        {
-          student: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-          description: 'idkgeswgwegwegewgewfgwe wergwege wg 3gewg wgew',
-          isVerified: true,
-          id: 1,
-        },
-        {
-          student: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-          description: 'idkgeswgwegwegewgewfgwe wergwege wg 3gewg wgew',
-          isVerified: true,
-          id: 2,
-        },
-        {
-          student: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-          description: 'idkgeswgwegwegewgewfgwe wergwege wg 3gewg wgew',
-          isVerified: true,
-          id: 3,
-        },
-        {
-          student: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-          description: 'idkgeswgwegwegewgewfgwe wergwege wg 3gewg wgew',
-          isVerified: true,
-          id: 4,
-        },
-        {
-          student: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-          description: 'idkgeswgwegwegewgewfgwe wergwege wg 3gewg wgew',
-          isVerified: true,
-          id: 5,
-        },
-        {
-          student: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-          description: 'idkgeswgwegwegewgewfgwe wergwege wg 3gewg wgew',
-          isVerified: true,
-          id: 6,
-        },
-        {
-          student: '0xd899067B8fEFaA4A130a0e1B9C5B1C05f688883c',
-          description: 'idkgeswgwegwegewgewfgwe wergwege wg 3gewg wgew',
-          isVerified: true,
-          id: 7,
-        },
-        {
-          student: '0xd899067B8fEFaA4A130a0e1B9C5B1C05f688883c',
-          description: 'idkgeswgwegwegewgewfgwe wergwege wg 3gewg wgew',
-          isVerified: false,
-          id: 8,
-        },
-      ] as Achievement[];
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ID;
 
-      return mock;
+export const useAchievements = (sender?: string, projectId?: number) => {
+  const senderAddress = sender as `0x${string}`;
+
+  const {
+    data: unverifiedData,
+    isLoading: unverifiedLoading,
+    refetch: refetchUnverified,
+  } = useReadContract({
+    abi: abi,
+    functionName: 'getUnverifiedAchievementsForVerifier',
+    address: CONTRACT_ADDRESS,
+    account: senderAddress,
+    args: [BigInt(projectId ?? 0)],
+    query: {
+      enabled: projectId !== undefined,
+      select: (data) =>
+        data.map((x) => {
+          return {
+            id: Number(x.achievementId),
+            canVerify: !x.isVerified ? true : false,
+            description: x.description,
+            isVerified: x.isVerified,
+            studentWallet: x.studentWallet,
+            verifiedCount: Number(x.verifiedCount),
+            nftTokenId: x.isVerified ? Number(x.nftTokenId) : null,
+          } as Achievement;
+        }),
+    },
+  });
+
+  const {
+    data: verifiedData,
+    isLoading: verifiedLoading,
+    refetch: refetchVerified,
+  } = useReadContract({
+    abi: abi,
+    functionName: 'getVerifiedAchievementsForVerifier',
+    address: CONTRACT_ADDRESS,
+    account: senderAddress,
+    args: [BigInt(projectId ?? 0)],
+    query: {
+      enabled: projectId !== undefined,
+      select: (data) =>
+        data.map((x) => {
+          return {
+            id: Number(x.achievementId),
+            canVerify: false,
+            description: x.description,
+            isVerified: x.isVerified,
+            studentWallet: x.studentWallet,
+            verifiedCount: Number(x.verifiedCount),
+            nftTokenId: x.isVerified ? Number(x.nftTokenId) : null,
+          } as Achievement;
+        }),
+    },
+  });
+
+  const data = useMemo(
+    () => [...(unverifiedData ?? []), ...(verifiedData ?? [])],
+    [unverifiedData, verifiedData],
+  );
+
+  const isLoading = useMemo(
+    () => verifiedLoading || unverifiedLoading,
+    [verifiedLoading, unverifiedLoading],
+  );
+
+  const refetch = useCallback(async () => {
+    await Promise.all([refetchVerified(), refetchUnverified()]);
+  }, [refetchVerified, refetchUnverified]);
+
+  return { data, isLoading, refetch };
+};
+
+export const useMyAchievements = (sender?: string, projectId?: number) => {
+  const senderAddress = sender as `0x${string}`;
+
+  return useReadContract({
+    abi: abi,
+    functionName: 'getAllMyAchievementsForStudent',
+    address: CONTRACT_ADDRESS,
+    account: senderAddress,
+    query: {
+      enabled: projectId !== undefined,
+      select: (data) =>
+        data
+          .filter((x) => x.projectId === BigInt(projectId ?? -1))
+          .map((x) => {
+            return {
+              id: Number(x.achievementId),
+              canVerify: false,
+              description: x.description,
+              isVerified: x.isVerified,
+              studentWallet: x.studentWallet,
+              verifiedCount: Number(x.verifiedCount),
+              nftTokenId: x.isVerified ? Number(x.nftTokenId) : null,
+            } as Achievement;
+          }),
     },
   });
 };

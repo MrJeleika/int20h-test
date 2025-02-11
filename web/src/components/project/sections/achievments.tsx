@@ -8,18 +8,36 @@ import { Achievement } from '@/hooks/queries/use-achievements';
 
 type AchievementsProps = {
   achievements: Achievement[];
-  verify: (value: string) => void;
+  requiredVerifications: number;
+  verify: (value: number) => void;
   loading: boolean;
+};
+
+type TableMeta = {
+  verify: (value: number) => void;
+  requiredVerifications: number;
 };
 
 const columns: ColumnDef<Achievement>[] = [
   {
-    accessorKey: 'student',
+    accessorKey: 'studentWallet',
     header: 'Wallet',
   },
   {
     accessorKey: 'description',
     header: 'Description',
+  },
+  {
+    accessorKey: 'verificationCount',
+    header: 'Verifications',
+    cell: ({ cell, table }) => {
+      const meta = table.options.meta as TableMeta;
+      return (
+        <>
+          {cell.row.original.verifiedCount}/{meta.requiredVerifications}
+        </>
+      );
+    },
   },
   {
     accessorKey: 'isVerified',
@@ -39,14 +57,17 @@ const columns: ColumnDef<Achievement>[] = [
     },
   },
   {
+    accessorKey: 'nftTokenId',
+    header: 'NFT Id',
+  },
+  {
     header: '',
     accessorKey: 'actions',
     cell: ({ cell, table }) => {
+      const meta = table.options.meta as TableMeta;
       return (
-        !cell.row.original.isVerified && (
-          <Button
-            onClick={() => table.options.meta?.callback(cell.row.original.id)}
-          >
+        cell.row.original.canVerify && (
+          <Button onClick={() => meta?.verify(cell.row.original.id)}>
             <Check />
             Verify
           </Button>
@@ -56,7 +77,12 @@ const columns: ColumnDef<Achievement>[] = [
   },
 ];
 
-const Achievements = ({ achievements, loading, verify }: AchievementsProps) => {
+const Achievements = ({
+  achievements,
+  loading,
+  requiredVerifications,
+  verify,
+}: AchievementsProps) => {
   return (
     <div>
       <div className="mb-6 flex justify-between">
@@ -66,7 +92,7 @@ const Achievements = ({ achievements, loading, verify }: AchievementsProps) => {
         columns={columns}
         data={achievements}
         loading={loading}
-        callback={verify}
+        meta={{ verify, requiredVerifications }}
       />
     </div>
   );

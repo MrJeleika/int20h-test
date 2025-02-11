@@ -34,6 +34,10 @@ const columns: ColumnDef<Achievement>[] = [
       return <Checkbox disabled checked={cell.row.original.isVerified} />;
     },
   },
+  {
+    accessorKey: 'nftTokenId',
+    header: 'NFT Id',
+  },
 ];
 
 const MyAchievements = ({

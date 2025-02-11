@@ -1,26 +1,41 @@
-import { useQuery } from '@tanstack/react-query';
+import { useReadContract } from 'wagmi';
+
+import abi from '@/lib/contractAbi';
 
 export type ProjectDetail = {
   title: string;
   description: string;
   endDate: Date;
   owner: string;
+  requiredVerifications: number;
 };
+const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ID;
 
-export const useProject = () => {
-  return useQuery<ProjectDetail>({
-    queryKey: ['project'],
-    queryFn: async () => {
-      const mock = {
-        id: 1,
-        description: 'A cutting-edge AI initiative.',
-        endDate: new Date(),
-        owner: 'xxxxxxxxxxxxxxxxxxxxxxxx',
-        title: 'Project Alpha',
-      } as ProjectDetail;
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+export const useProject = (sender?: string, id?: number) => {
+  const senderAddress = sender as `0x${string}`;
 
-      return mock;
+  const contract = useReadContract({
+    abi: abi,
+    functionName: 'getAllProjects',
+    address: CONTRACT_ADDRESS,
+    account: senderAddress,
+    query: {
+      enabled: id !== undefined,
+      select: (data) => {
+        const project = data?.find((x) => x.projectId == BigInt(id!));
+
+        return project
+          ? ({
+              title: project.title,
+              description: project.title,
+              endDate: new Date(Number(project.deadlineTimestamp)),
+              owner: project?.owner,
+              requiredVerifications: Number(project.requiredVerificationsCount),
+            } as ProjectDetail)
+          : undefined;
+      },
     },
   });
+
+  return contract;
 };

@@ -123,6 +123,16 @@ describe('Example', () => {
     ).to.revertedWith('Not the project owner');
   });
 
+  it('user can get verifiers of the project', async () => {
+    const { main, user, owner, user1 } = await loadFixture(deployment);
+    await main.createProject('Project', 'Description', 1231234124124, true);
+
+    await main.addVerifierToProject(0, user.address);
+
+    const verifiers = await main.getProjectVerifiers(0);
+    expect(verifiers.length).to.be.equals(1);
+  });
+
   it('owner cannot post an achievement', async () => {
     const { main, user, owner, user1, user2 } = await loadFixture(deployment);
     await main.createProject('Project', 'Description', 1231234124124, true);
@@ -195,6 +205,28 @@ describe('Example', () => {
 
     expect(newPendingAchievements.length).to.eq(0);
     expect(verifiedAchievements.length).to.eq(1);
+  });
+
+  it('user can get correct amount of verified student achievements', async () => {
+    const { main, user, owner, user1, user2 } = await loadFixture(deployment);
+    await main.createProject('Project', 'Description', 1231234124124, true);
+
+    const userRunner = main.connect(user);
+
+    await userRunner.registerSelfStudent(0);
+
+    await userRunner.postAchievement(0, 'qq');
+
+    const secondUserRunner = main.connect(user1);
+    await secondUserRunner.registerSelfStudent(0);
+    await secondUserRunner.postAchievement(0, 'qq1');
+
+    await main.verify(0, 0);
+
+    const students = await main.getProjectStudents(0);
+
+    expect(students[0].achievements).to.eq(1);
+    expect(students[1].achievements).to.eq(0);
   });
 
   it('anyone can get achievement by id', async () => {

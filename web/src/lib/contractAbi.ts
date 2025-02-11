@@ -626,6 +626,68 @@ const abi = [
         type: 'uint256',
       },
     ],
+    name: 'getProjectStudents',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'wallet',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'achievements',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct StudentProjectInfo[]',
+        name: '',
+        type: 'tuple[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'projectId',
+        type: 'uint256',
+      },
+    ],
+    name: 'getProjectVerifiers',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'wallet',
+            type: 'address',
+          },
+          {
+            internalType: 'bool',
+            name: 'isVerifier',
+            type: 'bool',
+          },
+        ],
+        internalType: 'struct Verifier[]',
+        name: '',
+        type: 'tuple[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'projectId',
+        type: 'uint256',
+      },
+    ],
     name: 'getUnverifiedAchievementsForVerifier',
     outputs: [
       {

@@ -1,6 +1,6 @@
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { BookType, GraduationCap, NotebookPen, UserCheck } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import AddStudentDialog from '@/components/project/dialogs/add-student-dialog';
@@ -12,11 +12,16 @@ import Information from '@/components/project/sections/information';
 import MyAchievements from '@/components/project/sections/my-achievments';
 import Students from '@/components/project/sections/students';
 import Verifiers from '@/components/project/sections/verifiers';
-import { useAchievements } from '@/hooks/queries/use-achievements';
+import {
+  useAchievements,
+  useMyAchievements,
+} from '@/hooks/queries/use-achievements';
 import { useProject } from '@/hooks/queries/use-project';
 import { useStudents } from '@/hooks/queries/use-students';
 import { useVerifiers } from '@/hooks/queries/use-verifiers';
 import { routes } from '@/router';
+import { useWriteContract } from 'wagmi';
+import abi from '@/lib/contractAbi';
 
 const publicElements = [
   {
@@ -58,6 +63,8 @@ const ownerElements = [
   },
 ];
 
+const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ID;
+
 export default function Project() {
   const { id, page } = useParams();
 
@@ -81,11 +88,128 @@ export default function Project() {
 
   const navigate = useNavigate();
 
-  const { data: project, isLoading: projectLoading } = useProject();
-  const { data: students, isLoading: studentsLoading } = useStudents();
-  const { data: verifiers, isLoading: verifiersLoading } = useVerifiers();
-  const { data: achievements, isLoading: achievementsLoading } =
-    useAchievements();
+  const { data: project, isLoading: projectLoading } = useProject(
+    accountInfo.address,
+    Number(id),
+  );
+  const {
+    data: students,
+    isLoading: studentsLoading,
+    refetch: refetchStudents,
+  } = useStudents(accountInfo.address, Number(id));
+  const {
+    data: verifiers,
+    isLoading: verifiersLoading,
+    refetch: refetchVerifiers,
+  } = useVerifiers(accountInfo.address, Number(id));
+  const {
+    data: achievements,
+    isLoading: achievementsLoading,
+    refetch: refetchAchievements,
+  } = useAchievements(accountInfo.address, Number(id));
+  const {
+    data: myAchievements,
+    isLoading: myAchievementsLoading,
+    refetch: refetchMyAchievements,
+  } = useMyAchievements(accountInfo.address, Number(id));
+
+  const {
+    writeContractAsync: writePostAchievement,
+    isPending: isPostAchievementPending,
+    status: postAchievementStatus,
+  } = useWriteContract();
+
+  const postAchievement = useCallback(
+    async (description: string) => {
+      await writePostAchievement({
+        abi: abi,
+        address: CONTRACT_ADDRESS,
+        functionName: 'postAchievement',
+        args: [BigInt(id ?? -1), description],
+      });
+    },
+    [writePostAchievement, id],
+  );
+
+  useEffect(() => {
+    if (postAchievementStatus === 'success') {
+      refetchMyAchievements();
+      setAddAchievementModalActive(false);
+    }
+  }, [postAchievementStatus]);
+
+  const {
+    writeContractAsync: writeVerifyAchievement,
+    status: verifyAchievementStatus,
+  } = useWriteContract();
+
+  const verifyAchievement = useCallback(
+    async (achievementId: number) => {
+      await writeVerifyAchievement({
+        abi: abi,
+        address: CONTRACT_ADDRESS,
+        functionName: 'verify',
+        args: [BigInt(id ?? -1), BigInt(achievementId)],
+      });
+    },
+    [writeVerifyAchievement, id],
+  );
+
+  useEffect(() => {
+    if (verifyAchievementStatus === 'success') {
+      refetchAchievements();
+    }
+  }, [verifyAchievementStatus]);
+
+  const {
+    writeContractAsync: writeAddVerifier,
+    status: addVerifierStatus,
+    isPending: isAddVerifierPending,
+  } = useWriteContract();
+
+  const addVerifier = useCallback(
+    async (address: string) => {
+      await writeAddVerifier({
+        abi: abi,
+        address: CONTRACT_ADDRESS,
+        functionName: 'addVerifierToProject',
+        args: [BigInt(id ?? -1), address as `0x${string}`],
+      });
+    },
+    [writeAddVerifier, id],
+  );
+
+  useEffect(() => {
+    if (addVerifierStatus === 'success') {
+      refetchVerifiers();
+      setAddVerifierModalActive(false);
+    }
+  }, [addVerifierStatus]);
+
+  const {
+    writeContractAsync: writeAddStudent,
+    status: addStudentStatus,
+    isPending: isAddStudentPending,
+  } = useWriteContract();
+
+  const addStudent = useCallback(
+    async (address: string) => {
+      await writeAddStudent({
+        abi: abi,
+        address: CONTRACT_ADDRESS,
+        functionName: 'addStudentToProjectWhitelist',
+        args: [BigInt(id ?? -1), address as `0x${string}`],
+      });
+    },
+    [writeAddStudent, id],
+  );
+
+  useEffect(() => {
+    if (addStudentStatus === 'success') {
+      refetchStudents();
+      setAddStudentModalActive(false);
+    }
+  }, [addStudentStatus]);
 
   useEffect(() => {
     if (page && elements.some((x) => x.id === page)) {
@@ -94,10 +218,19 @@ export default function Project() {
   }, [page, elements]);
 
   useEffect(() => {
-    // MOCK
-    setIsOwner(true);
-    setIsVerifier(true);
-  }, []);
+    if (!project && !projectLoading) {
+      navigate(routes.root);
+    }
+  }, [project, projectLoading, navigate]);
+
+  useEffect(() => {
+    if (project?.owner) {
+      setIsOwner(project.owner === accountInfo.address);
+      setIsVerifier(
+        verifiers?.includes(accountInfo.address as `0x${string}`) ?? false,
+      );
+    }
+  }, [project?.owner, accountInfo.address]);
 
   useEffect(() => {
     if (activePage !== page) {
@@ -129,8 +262,8 @@ export default function Project() {
             <AddStudentDialog
               active={addStudentModalActive}
               setActive={setAddStudentModalActive}
-              loading={false}
-              onSubmit={() => console.warn('MOCK')}
+              loading={isAddStudentPending}
+              onSubmit={addStudent}
             />
           </>
         )}
@@ -145,8 +278,8 @@ export default function Project() {
             <AddVerifierDialog
               active={addVerifierModalActive}
               setActive={setAddVerifierModalActive}
-              loading={false}
-              onSubmit={() => console.warn('MOCK')}
+              loading={isAddVerifierPending}
+              onSubmit={addVerifier}
             />
           </>
         )}
@@ -155,26 +288,23 @@ export default function Project() {
             <Achievements
               achievements={achievements ?? []}
               loading={achievementsLoading}
-              verify={(id) => console.warn('MOCK', id)}
+              requiredVerifications={project?.requiredVerifications ?? 1}
+              verify={verifyAchievement}
             ></Achievements>
           </>
         )}
         {activePage === 'my-achievements' && (
           <>
             <MyAchievements
-              achievements={
-                achievements?.filter(
-                  (x) => x.student === accountInfo.address,
-                ) ?? []
-              }
-              loading={achievementsLoading}
+              achievements={myAchievements ?? []}
+              loading={myAchievementsLoading}
               setSubmitAchievementDialog={setAddAchievementModalActive}
             ></MyAchievements>
             <SubmitAchievementDialog
               active={addAchievementModalActive}
               setActive={setAddAchievementModalActive}
-              loading={false}
-              onSubmit={(desc) => console.warn('MOCK', desc)}
+              loading={isPostAchievementPending}
+              onSubmit={postAchievement}
             />
           </>
         )}
