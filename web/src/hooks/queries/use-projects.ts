@@ -1,40 +1,85 @@
-import { useQuery } from '@tanstack/react-query';
+import abi from '@/lib/contractAbi';
+import { useMemo } from 'react';
+import { useReadContract } from 'wagmi';
 
 export type Project = {
   id: number;
   name: string;
   description: string;
+  type: 'participated' | 'owned' | 'verification';
 };
 
-export const useProjects = () => {
-  return useQuery<Project[]>({
-    queryKey: ['projects'],
-    queryFn: async () => {
-      const mock = [
-        {
-          id: 1,
-          name: 'Project Alpha',
-          description: 'A cutting-edge AI initiative.',
-        },
-        {
-          id: 2,
-          name: 'Project Beta',
-          description: 'Blockchain-based security system.',
-        },
-        {
-          id: 3,
-          name: 'Project Gamma',
-          description: 'Next-gen cloud computing platform.',
-        },
-        {
-          id: 4,
-          name: 'Project Delta',
-          description: 'An innovative VR experience.',
-        },
-      ] as Project[];
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ID;
 
-      return mock;
-    },
+export const useProjects = () => {
+  const { data: participatedProjects, isLoading: participatedProjectsLoading } =
+    useReadContract({
+      abi: abi,
+      functionName: 'getMyParticipatedProjects',
+      address: CONTRACT_ADDRESS,
+    });
+
+  const { data: ownProjects, isLoading: ownProjectsLoading } = useReadContract({
+    abi: abi,
+    functionName: 'getMyOwnedProjects',
+    address: CONTRACT_ADDRESS,
   });
+
+  const { data: verificationProjects, isLoading: verificationProjectsLoading } =
+    useReadContract({
+      abi: abi,
+      functionName: 'getMyVerificationProjects',
+      address: CONTRACT_ADDRESS,
+    });
+
+  const loading = useMemo(
+    () =>
+      participatedProjectsLoading ||
+      ownProjectsLoading ||
+      verificationProjectsLoading,
+    [
+      participatedProjectsLoading,
+      ownProjectsLoading,
+      verificationProjectsLoading,
+    ],
+  );
+
+  const data = useMemo(() => {
+    const data = [] as Project[];
+
+    ownProjects?.forEach((x) => {
+      if (!data.find((d) => Number(x.projectId) == d.id)) {
+        data.push({
+          id: Number(x.projectId),
+          type: 'owned',
+          name: x.title,
+          description: x.description,
+        });
+      }
+    });
+
+    verificationProjects?.forEach((x) => {
+      if (!data.find((d) => Number(x.projectId) == d.id)) {
+        data.push({
+          id: Number(x.projectId),
+          type: 'verification',
+          name: x.title,
+          description: x.description,
+        });
+      }
+    });
+
+    participatedProjects?.forEach((x) => {
+      if (!data.find((d) => Number(x.projectId) == d.id)) {
+        data.push({
+          id: Number(x.projectId),
+          type: 'participated',
+          name: x.title,
+          description: x.description,
+        });
+      }
+    });
+  }, [participatedProjects, ownProjects, verificationProjects]);
+
+  return { data, loading };
 };

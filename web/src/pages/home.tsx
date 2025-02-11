@@ -9,19 +9,14 @@ import Projects from '@/components/projects/projects';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { CreateProject } from '@/hooks/mutations/use-create-project';
-import abi from '@/Main';
+import abi from '@/lib/contractAbi';
 import { useProjects } from '@/hooks/queries/use-projects';
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ID;
 export default function Home() {
-  const { data, isLoading } = useProjects();
-  // const { data, isLoading } = useReadContract({
-  //   abi: abi,
-  //   functionName: 'getMyProjects',
-  //   address: CONTARCT_ADDRESS,
-  // });
+  const { data, loading } = useProjects();
 
-  // console.log(data);
+  console.log(data);
 
   const accountInfo = useAppKitAccount();
   const { open } = useAppKit();
@@ -95,7 +90,7 @@ export default function Home() {
         </div>
       </div>
       <div className="h-full">
-        <Projects projects={data ?? []} isLoading={isLoading} />
+        <Projects projects={data ?? []} isLoading={loading} />
       </div>
       <div className="mt-auto flex w-full">
         <Button

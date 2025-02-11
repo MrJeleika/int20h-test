@@ -152,50 +152,62 @@ contract Main is ERC721 {
     }
 
     function getMyParticipatedProjects() public view returns(Project[] memory) {
-        Project[] memory myProjects = new Project[](myParticipatedProjectsCount[msg.sender]);
+        if (myParticipatedProjectsCount[msg.sender] > 0) {
+            Project[] memory myProjects = new Project[](myParticipatedProjectsCount[msg.sender]);
 
-        uint myProjectId = 0;
+            uint myProjectId = 0;
 
-        Project memory tempProj;
-        for (uint i = 0; i < projects.length; i++) {
-            tempProj = projects[i];
-            if (projectStudentExists[tempProj.projectId][msg.sender]) {
-                myProjects[myProjectId++] = tempProj;
+            Project memory tempProj;
+            for (uint i = 0; i < projects.length; i++) {
+                tempProj = projects[i];
+                if (projectStudentExists[tempProj.projectId][msg.sender]) {
+                    myProjects[myProjectId++] = tempProj;
+                }
             }
+
+            return myProjects;
         }
 
-        return myProjects;
+        return new Project[](0);
     }
 
     function getMyOwnedProjects() public view returns(Project[] memory) {
-        Project[] memory ownedProjects = new Project[](myOwnedProjectsCount[msg.sender]);
+        if (myOwnedProjectsCount[msg.sender] > 0) {
+            Project[] memory ownedProjects = new Project[](myOwnedProjectsCount[msg.sender]);
 
-        uint myOwnedProjectId = 0;
-        Project memory tempProj;
-        for (uint i = 0; i < projects.length; i++) { 
-            tempProj = projects[i];
-            if (tempProj.owner == msg.sender) {
-                ownedProjects[myOwnedProjectId++] = tempProj;
+            uint myOwnedProjectId = 0;
+            Project memory tempProj;
+            for (uint i = 0; i < projects.length; i++) { 
+                tempProj = projects[i];
+                if (tempProj.owner == msg.sender) {
+                    ownedProjects[myOwnedProjectId++] = tempProj;
+                }
             }
+
+            return ownedProjects;
         }
 
-        return ownedProjects;
+        return new Project[](0);
     }
 
     function getMyVerificationProjects() public view returns(Project[] memory) {
-        Project[] memory verificationProjects = new Project[](myVerificationProjectsCount[msg.sender]);
+        if (myVerificationProjectsCount[msg.sender] > 0) {
+            Project[] memory verificationProjects = new Project[](myVerificationProjectsCount[msg.sender]);
 
-        uint myVerificationProjectId = 0;
+            uint myVerificationProjectId = 0;
 
-        Project memory tempProj;
-        for (uint i = 0; i < projects.length; i++) { 
-            tempProj = projects[i];
-            if (projectVerifierExists[tempProj.projectId][msg.sender] == true) {
-                verificationProjects[myVerificationProjectId++] = tempProj;
+            Project memory tempProj;
+            for (uint i = 0; i < projects.length; i++) { 
+                tempProj = projects[i];
+                if (projectVerifierExists[tempProj.projectId][msg.sender] == true) {
+                    verificationProjects[myVerificationProjectId++] = tempProj;
+                }
             }
+
+            return verificationProjects;
         }
 
-        return verificationProjects;
+        return new Project[](0);
     }
 
     function getUnverifiedAchievementsForVerifier(uint projectId) public onlyVerifier(projectId) view returns(Achievement[] memory) {
