@@ -24,7 +24,10 @@ const Projects = ({ projects, isLoading }: ProjectsProps) => {
               onClick={() => navigate(`${routes.project}/${project.id}`)}
             >
               <CardContent className="p-4">
-                <h2 className="text-lg font-semibold">{project.name}</h2>
+                <div className="flex justify-between">
+                  <h2 className="text-lg font-semibold">{project.name}</h2>
+                  <h3>{project.type}</h3>
+                </div>
                 <p className="text-sm text-gray-500">{project.description}</p>
               </CardContent>
             </Card>

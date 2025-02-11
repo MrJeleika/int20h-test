@@ -14,12 +14,10 @@ import { useProjects } from '@/hooks/queries/use-projects';
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ID;
 export default function Home() {
-  const { data, loading } = useProjects();
-
-  console.log(data);
-
   const accountInfo = useAppKitAccount();
   const { open } = useAppKit();
+
+  const { data, loading } = useProjects(accountInfo.address);
 
   const [joinDialogActive, setJoinDialogActive] = useState(false);
   const [createDialogActive, setCreateDialogActive] = useState(false);
@@ -55,7 +53,7 @@ export default function Home() {
     (id: number) => {
       writeJoinProject({
         abi: abi,
-        address: '0xCEbe0a185E7042126589C1c42D4C48b603A29340',
+        address: CONTRACT_ADDRESS,
         functionName: 'registerSelfStudent',
         args: [BigInt(id)],
       });

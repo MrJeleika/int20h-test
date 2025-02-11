@@ -11,18 +11,22 @@ export type Project = {
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ID;
 
-export const useProjects = () => {
+export const useProjects = (sender?: string) => {
+  const senderAddress = sender as `0x${string}`;
+
   const { data: participatedProjects, isLoading: participatedProjectsLoading } =
     useReadContract({
       abi: abi,
       functionName: 'getMyParticipatedProjects',
       address: CONTRACT_ADDRESS,
+      account: senderAddress,
     });
 
   const { data: ownProjects, isLoading: ownProjectsLoading } = useReadContract({
     abi: abi,
     functionName: 'getMyOwnedProjects',
     address: CONTRACT_ADDRESS,
+    account: senderAddress,
   });
 
   const { data: verificationProjects, isLoading: verificationProjectsLoading } =
@@ -30,6 +34,7 @@ export const useProjects = () => {
       abi: abi,
       functionName: 'getMyVerificationProjects',
       address: CONTRACT_ADDRESS,
+      account: senderAddress,
     });
 
   const loading = useMemo(
@@ -79,6 +84,8 @@ export const useProjects = () => {
         });
       }
     });
+
+    return data;
   }, [participatedProjects, ownProjects, verificationProjects]);
 
   return { data, loading };
