@@ -51,7 +51,7 @@ const MyAchievements = ({
     <div>
       <div className="mb-6 flex justify-between">
         <h1 className="text-2xl font-bold">My Achievements</h1>
-        {deadlinePassed && (
+        {!deadlinePassed && (
           <Button onClick={() => setSubmitAchievementDialog(true)}>
             <Plus />
             Submit achievement

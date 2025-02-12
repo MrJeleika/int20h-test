@@ -7,6 +7,7 @@ import "./Project.sol";
 import "./Verifier.sol";
 import "./StudentProjectInfo.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "hardhat/console.sol";
 
 contract Main is ERC721 {
     
@@ -79,7 +80,7 @@ contract Main is ERC721 {
 
     function endProject(uint projectId) public onlyProjectOwner(projectId) {
         Project storage project = projects[projectId];
-        require(block.timestamp >= project.deadlineTimestamp / 1000, "Project is running");
+        require(block.timestamp <= project.deadlineTimestamp / 1000, "Project is running");
         require(!project.isFinished, "Project already finished");
         
         address mvp = currentProjectMVP[projectId];
@@ -157,8 +158,8 @@ contract Main is ERC721 {
     function postAchievement(uint projectId, string memory description) public onlyProjectStudent(projectId) {
         Project memory project = projects[projectId];
         uint currentTime = block.timestamp;
-
-        require(currentTime >= project.deadlineTimestamp / 1000, "The project deadline has passed");
+        console.log("cur %s proj %s", currentTime, project.deadlineTimestamp / 1000);
+        require(currentTime <= project.deadlineTimestamp / 1000, "The project deadline has passed");
         
         Verifier memory tempVerifier;
         for (uint i = 0; i < verifiers.length; i++) {
