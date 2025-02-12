@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 
+import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Skeleton } from '../ui/skeleton';
 
 import type { Project } from '@/hooks/queries/use-projects';
 import { routes } from '@/router';
-import { Button } from '../ui/button';
 
 type ProjectsProps = {
   projects: Project[];

@@ -2,6 +2,8 @@ import { CalendarIcon, Loader2, Plus } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Button } from '../ui/button';
+import { Calendar } from '../ui/calendar';
+import { Checkbox } from '../ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -12,10 +14,9 @@ import {
 } from '../ui/dialog';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { CreateProject } from '@/hooks/mutations/use-create-project';
-import { Checkbox } from '../ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { Calendar } from '../ui/calendar';
+
+import { CreateProject } from '@/hooks/mutations/use-create-project';
 import { cn } from '@/lib/utils';
 
 type CreateProjectDialogProps = {

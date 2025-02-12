@@ -2,7 +2,7 @@ export interface FetcherResponse<T> {
   data: T | null;
   status: number;
   statusText: string;
-  error?: string
+  error?: string;
 }
 
 export class Fetcher {
@@ -92,6 +92,7 @@ export class Fetcher {
         }
       }
     } catch {
+      // empty
     }
 
     return {

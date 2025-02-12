@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react';
+import { formatEther } from 'viem';
 import { useReadContract } from 'wagmi';
 
 import abi from '@/lib/contractAbi';
-import { formatEther, parseEther } from 'viem';
 
 export type Project = {
   id: number;
