@@ -10,7 +10,7 @@ type VerifiersProps = {
   loading: boolean;
 };
 
-const columns: ColumnDef<string>[] = [
+const columns: ColumnDef<{ wallet: string }>[] = [
   {
     accessorKey: 'wallet',
     header: 'Wallet',
