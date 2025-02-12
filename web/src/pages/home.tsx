@@ -94,7 +94,11 @@ export default function Home() {
         </div>
       </div>
       <div className="h-full">
-        <Projects projects={data ?? []} isLoading={loading} />
+        <Projects
+          setJoinDialogActive={setJoinDialogActive}
+          projects={data ?? []}
+          isLoading={loading}
+        />
       </div>
       <div className="mt-auto flex w-full">
         <Button

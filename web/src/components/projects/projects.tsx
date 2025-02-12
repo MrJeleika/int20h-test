@@ -5,16 +5,22 @@ import { Skeleton } from '../ui/skeleton';
 
 import type { Project } from '@/hooks/queries/use-projects';
 import { routes } from '@/router';
+import { Button } from '../ui/button';
 
 type ProjectsProps = {
   projects: Project[];
   isLoading: boolean;
+  setJoinDialogActive: (value: boolean) => void;
 };
 
-const Projects = ({ projects, isLoading }: ProjectsProps) => {
+const Projects = ({
+  projects,
+  isLoading,
+  setJoinDialogActive,
+}: ProjectsProps) => {
   const navigate = useNavigate();
 
-  return (
+  return projects.length > 0 ? (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
       {!isLoading
         ? projects.map((project) => (
@@ -47,6 +53,18 @@ const Projects = ({ projects, isLoading }: ProjectsProps) => {
               </CardContent>
             </Card>
           ))}
+    </div>
+  ) : (
+    <div className="mt-36 flex flex-col items-center justify-center text-center">
+      <h2 className="text-xl font-semibold">
+        You haven't joined any projects yet
+      </h2>
+      <p className="text-sm text-gray-500">
+        Explore and join projects to get started!
+      </p>
+      <Button className="mt-4" onClick={() => setJoinDialogActive(true)}>
+        Join Project
+      </Button>
     </div>
   );
 };
