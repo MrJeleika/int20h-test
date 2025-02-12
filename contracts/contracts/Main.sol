@@ -7,7 +7,6 @@ import "./Project.sol";
 import "./Verifier.sol";
 import "./StudentProjectInfo.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "hardhat/console.sol";
 
 contract Main is ERC721 {
     
@@ -81,7 +80,6 @@ contract Main is ERC721 {
     function endProject(uint projectId) public onlyProjectOwner(projectId) {
         Project storage project = projects[projectId];
         require(block.timestamp >= project.deadlineTimestamp / 1000, "Project is running");
-        console.log("Finished %s", project.isFinished);
         require(!project.isFinished, "Project already finished");
         
         address mvp = currentProjectMVP[projectId];
