@@ -14,4 +14,5 @@ struct Project {
     bool isPublic;
     uint requiredVerificationsCount;
     uint256 rewardAmount;
+    bool isFinished;
 }

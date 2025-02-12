@@ -7,6 +7,7 @@ import "./Project.sol";
 import "./Verifier.sol";
 import "./StudentProjectInfo.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "hardhat/console.sol";
 
 contract Main is ERC721 {
     
@@ -36,6 +37,8 @@ contract Main is ERC721 {
     uint private achievementCounter = 0;
     
     uint256 private _nextTokenId;
+
+    event ProjectEnded(uint projectId, address recipient, uint amount);
 
     constructor() ERC721("AchievementCertificate", "AC") { }
 
@@ -67,15 +70,42 @@ contract Main is ERC721 {
         _safeMint(student, _nextTokenId);
     }
 
-    function createProject(string memory title, string memory description, uint256 deadlineTimestamp, bool isPublic) public payable {
-        require(msg.value > 0, "You need to specify the reward amount");
-        
-        Project memory tempProject = Project(projectCounter, title, description, deadlineTimestamp, msg.sender, isPublic, 1, msg.value);
+    function createProject(string memory title, string memory description, uint256 deadlineTimestamp, bool isPublic) public payable {     
+        Project memory tempProject = Project(projectCounter, title, description, deadlineTimestamp, msg.sender, isPublic, 1, msg.value, false);
         projectVerifierExists[projectCounter][msg.sender] = true;
         projects.push(tempProject);
         myOwnedProjectsCount[msg.sender]++;
         projectCounter++;
     }
+
+    function endProject(uint projectId) public onlyProjectOwner(projectId) {
+        Project storage project = projects[projectId];
+        require(block.timestamp >= project.deadlineTimestamp / 1000, "Project is running");
+        console.log("Finished %s", project.isFinished);
+        require(!project.isFinished, "Project already finished");
+        
+        address mvp = currentProjectMVP[projectId];
+        uint mvpAchievementCount = currentProjectMostAchievementsCount[projectId];
+        uint rewardAmount = project.rewardAmount;
+        address payable recipient;
+
+        if (rewardAmount > 0) {
+            if (mvpAchievementCount > 0) {
+                recipient = payable(mvp);
+            } else {
+                recipient = payable(project.owner);
+            }
+
+            require(address(this).balance >= rewardAmount, "Insufficient contract balance");
+
+            (bool sent, ) = recipient.call{value: rewardAmount}("");
+            require(sent, "Failed to transfer reward");
+
+            emit ProjectEnded(projectId, recipient, rewardAmount);
+        }
+
+        project.isFinished = true;
+    } 
     
     function registerSelfStudent(uint projectId) public {
         Project memory project = projects[projectId];
@@ -127,7 +157,11 @@ contract Main is ERC721 {
     }
 
     function postAchievement(uint projectId, string memory description) public onlyProjectStudent(projectId) {
+        Project memory project = projects[projectId];
+        uint currentTime = block.timestamp;
 
+        require(currentTime >= project.deadlineTimestamp / 1000, "The project deadline has passed");
+        
         Verifier memory tempVerifier;
         for (uint i = 0; i < verifiers.length; i++) {
             tempVerifier = verifiers[i];

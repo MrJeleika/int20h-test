@@ -13,7 +13,9 @@ describe('Example', () => {
   it('project is created by owner and successfully retrieved with getAllProjects()', async () => {
     const { main, user, owner } = await loadFixture(deployment);
 
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
 
     const projects = await main.getAllProjects();
 
@@ -23,7 +25,9 @@ describe('Example', () => {
   it('project is created by owner and received with getMyOwnedProjects()', async () => {
     const { main, user, owner } = await loadFixture(deployment);
 
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
 
     const ownedProjects = await main.getMyOwnedProjects();
 
@@ -32,7 +36,9 @@ describe('Example', () => {
 
   it('project is created by owner and received by another user with getAllProjects()', async () => {
     const { main, user, owner } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
 
     const userRunner = main.connect(user);
     const projects = await userRunner.getAllProjects();
@@ -42,8 +48,12 @@ describe('Example', () => {
 
   it('public project is created by owner and participated by another user with registerSelfStudent()', async () => {
     const { main, user, owner } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
-    await main.createProject('Project1', 'Description1', 1231234124125, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
+    await main.createProject('Project1', 'Description1', 1231234124125, true, {
+      value: ethers.parseEther('1'),
+    });
 
     const userRunner = main.connect(user);
 
@@ -57,8 +67,12 @@ describe('Example', () => {
 
   it('private project is created by owner and it cannot be participated by other user with registerSelfStudent()', async () => {
     const { main, user, owner } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
-    await main.createProject('Project1', 'Description1', 1231234124125, false, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
+    await main.createProject('Project1', 'Description1', 1231234124125, false, {
+      value: ethers.parseEther('1'),
+    });
 
     const userRunner = main.connect(user);
 
@@ -71,8 +85,12 @@ describe('Example', () => {
 
   it('owners cannot participate their projects with registerSelfStudent or addToWhitelist', async () => {
     const { main, user, owner } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
-    await main.createProject('Project1', 'Description1', 1231234124125, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
+    await main.createProject('Project1', 'Description1', 1231234124125, true, {
+      value: ethers.parseEther('1'),
+    });
 
     expect(async () => await main.registerSelfStudent(0)).to.revertedWith(
       'You are the project owner',
@@ -85,8 +103,12 @@ describe('Example', () => {
 
   it('owner can add a verifier to a project and after that verifier can receive the projects where he is the verifier', async () => {
     const { main, user, owner, user1 } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
-    await main.createProject('Project1', 'Description1', 1231234124125, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
+    await main.createProject('Project1', 'Description1', 1231234124125, true, {
+      value: ethers.parseEther('1'),
+    });
 
     await main.addVerifierToProject(0, user1.address);
 
@@ -100,8 +122,12 @@ describe('Example', () => {
 
   it('owner cannot add a duplicate verifier to a project ', async () => {
     const { main, user, owner, user1 } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
-    await main.createProject('Project1', 'Description1', 1231234124125, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
+    await main.createProject('Project1', 'Description1', 1231234124125, true, {
+      value: ethers.parseEther('1'),
+    });
 
     await main.addVerifierToProject(0, user1.address);
 
@@ -114,8 +140,12 @@ describe('Example', () => {
 
   it('non-owner cannot add a verifier to a project', async () => {
     const { main, user, owner, user1 } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
-    await main.createProject('Project1', 'Description1', 1231234124125, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
+    await main.createProject('Project1', 'Description1', 1231234124125, true, {
+      value: ethers.parseEther('1'),
+    });
 
     const userRunner = main.connect(user);
 
@@ -126,7 +156,9 @@ describe('Example', () => {
 
   it('user can get verifiers of the project', async () => {
     const { main, user, owner, user1 } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
 
     await main.addVerifierToProject(0, user.address);
 
@@ -136,7 +168,9 @@ describe('Example', () => {
 
   it('owner cannot post an achievement', async () => {
     const { main, user, owner, user1, user2 } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
 
     expect(async () => await main.postAchievement(0, 'qq')).to.revertedWith(
       'You are not the student for this project.',
@@ -145,7 +179,9 @@ describe('Example', () => {
 
   it('student can post an achievement and receive his achievements', async () => {
     const { main, user, owner, user1, user2 } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
 
     const userRunner = main.connect(user);
 
@@ -160,7 +196,9 @@ describe('Example', () => {
 
   it('owner can add students to private project whitelist and they can then postAchievements', async () => {
     const { main, user, owner } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, false, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, false, {
+      value: ethers.parseEther('1'),
+    });
     await main.addStudentToProjectWhitelist(0, user.address);
 
     const userRunner = main.connect(user);
@@ -175,7 +213,9 @@ describe('Example', () => {
 
   it('verifiers can verify a project achievement', async () => {
     const { main, user, owner, user1, user2 } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
 
     await main.addVerifierToProject(0, user1.address);
     await main.addVerifierToProject(0, user2.address);
@@ -210,7 +250,9 @@ describe('Example', () => {
 
   it('user can get correct amount of verified student achievements', async () => {
     const { main, user, owner, user1, user2 } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
 
     const userRunner = main.connect(user);
 
@@ -232,7 +274,9 @@ describe('Example', () => {
 
   it('anyone can get achievement by id', async () => {
     const { main, user, owner, user1, user2 } = await loadFixture(deployment);
-    await main.createProject('Project', 'Description', 1231234124124, true, { value: ethers.parseEther("1") });
+    await main.createProject('Project', 'Description', 1231234124124, true, {
+      value: ethers.parseEther('1'),
+    });
 
     const userRunner = main.connect(user);
 
@@ -243,5 +287,108 @@ describe('Example', () => {
     const achievement = await userRunner.getAchievementById(0);
 
     console.log(achievement);
+  });
+
+  it('owner can end project and transfer reward money to mvp', async () => {
+    const { main, user, owner, user1, user2 } = await loadFixture(deployment);
+    const date = new Date();
+    date.setSeconds(new Date().getSeconds() + 2);
+
+    await main.createProject('Project', 'Description', date.getTime(), true, {
+      value: ethers.parseEther('1'),
+    });
+
+    const userRunner = main.connect(user);
+
+    await userRunner.registerSelfStudent(0);
+
+    await userRunner.postAchievement(0, 'qq');
+
+    await main.verify(0, 0);
+
+    await new Promise((resolve) => setTimeout(resolve, 2100));
+
+    const userBalanceBefore = await ethers.provider.getBalance(user.address);
+    await main.endProject(0);
+    const userBalanceAfter = await ethers.provider.getBalance(user.address);
+    // check if user received 1 ETH
+    const expectedBalance = userBalanceBefore + ethers.parseEther('1');
+    expect(userBalanceAfter).to.be.closeTo(
+      expectedBalance,
+      ethers.parseEther('0.001'),
+    );
+  });
+
+  it('owner would receive refund if no achievements were verified', async () => {
+    const { main, user, owner, user1, user2 } = await loadFixture(deployment);
+    const date = new Date();
+    date.setSeconds(new Date().getSeconds() + 2);
+
+    await main.createProject('Project', 'Description', date.getTime(), true, {
+      value: ethers.parseEther('1'),
+    });
+
+    const userRunner = main.connect(user);
+
+    await userRunner.registerSelfStudent(0);
+
+    await userRunner.postAchievement(0, 'qq');
+
+    await new Promise((resolve) => setTimeout(resolve, 2100));
+
+    const userBalanceBefore = await ethers.provider.getBalance(owner.address);
+    await main.endProject(0);
+    const userBalanceAfter = await ethers.provider.getBalance(owner.address);
+    // check if owner received 1 ETH
+    const expectedBalance = userBalanceBefore + ethers.parseEther('1');
+    expect(userBalanceAfter).to.be.closeTo(
+      expectedBalance,
+      ethers.parseEther('0.001'),
+    );
+  });
+
+  it('owner unable to end project before deadline', async () => {
+    const { main, user, owner, user1, user2 } = await loadFixture(deployment);
+    const date = new Date();
+    date.setSeconds(new Date().getSeconds() + 2);
+
+    await main.createProject('Project', 'Description', date.getTime(), true, {
+      value: ethers.parseEther('1'),
+    });
+    expect(main.endProject(0)).to.revertedWith('Project is running');
+  });
+
+  it('student unable to post achievements after deadline', async () => {
+    const { main, user, owner, user1, user2 } = await loadFixture(deployment);
+    const date = new Date();
+    date.setSeconds(new Date().getSeconds() + 2);
+
+    await main.createProject('Project', 'Description', date.getTime(), true, {
+      value: ethers.parseEther('1'),
+    });
+
+    const userRunner = main.connect(user);
+
+    await userRunner.registerSelfStudent(0);
+
+    await new Promise((resolve) => setTimeout(resolve, 2100));
+    expect(userRunner.postAchievement(0, 'qq')).to.be.revertedWith(
+      'The project deadline has passed',
+    );
+  });
+
+  it('owner unable to end project twice', async () => {
+    const { main, user, owner, user1, user2 } = await loadFixture(deployment);
+    const date = new Date();
+    date.setSeconds(new Date().getSeconds() + 1);
+
+    await main.createProject('Project', 'Description', date.getTime(), true, {
+      value: ethers.parseEther('1'),
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 1100));
+    await main.endProject(0);
+
+    expect(main.endProject(0)).to.be.revertedWith('Project already finished');
   });
 });
