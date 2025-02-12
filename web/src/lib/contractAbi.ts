@@ -161,6 +161,31 @@ const abi = [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'projectId',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'recipient',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'ProjectEnded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: 'address',
         name: 'from',
@@ -279,6 +304,19 @@ const abi = [
       },
     ],
     name: 'createProject',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'projectId',
+        type: 'uint256',
+      },
+    ],
+    name: 'endProject',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -440,6 +478,16 @@ const abi = [
             name: 'requiredVerificationsCount',
             type: 'uint256',
           },
+          {
+            internalType: 'uint256',
+            name: 'rewardAmount',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bool',
+            name: 'isFinished',
+            type: 'bool',
+          },
         ],
         internalType: 'struct Project[]',
         name: '',
@@ -509,6 +557,16 @@ const abi = [
             name: 'requiredVerificationsCount',
             type: 'uint256',
           },
+          {
+            internalType: 'uint256',
+            name: 'rewardAmount',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bool',
+            name: 'isFinished',
+            type: 'bool',
+          },
         ],
         internalType: 'struct Project[]',
         name: '',
@@ -559,6 +617,16 @@ const abi = [
             name: 'requiredVerificationsCount',
             type: 'uint256',
           },
+          {
+            internalType: 'uint256',
+            name: 'rewardAmount',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bool',
+            name: 'isFinished',
+            type: 'bool',
+          },
         ],
         internalType: 'struct Project[]',
         name: '',
@@ -608,6 +676,16 @@ const abi = [
             internalType: 'uint256',
             name: 'requiredVerificationsCount',
             type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'rewardAmount',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bool',
+            name: 'isFinished',
+            type: 'bool',
           },
         ],
         internalType: 'struct Project[]',

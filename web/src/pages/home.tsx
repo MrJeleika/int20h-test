@@ -1,7 +1,7 @@
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
-import { Backpack, Plus, RefreshCcw } from 'lucide-react';
+import { Backpack, Plus } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { useReadContract, useWriteContract } from 'wagmi';
+import { useWriteContract } from 'wagmi';
 
 import CreateProjectDialog from '@/components/projects/create-project-dialog';
 import JoinProjectDialog from '@/components/projects/join-project-dialog';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { CreateProject } from '@/hooks/mutations/use-create-project';
 import abi from '@/lib/contractAbi';
 import { useProjects } from '@/hooks/queries/use-projects';
+import { parseEther } from 'viem';
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ID;
 export default function Home() {
@@ -46,6 +47,7 @@ export default function Home() {
           BigInt(data.finishDate.getTime()),
           data.isPublic,
         ],
+        value: data.reward ? parseEther(data.reward.toString()) : undefined,
       });
     },
     [writeCreateProject],

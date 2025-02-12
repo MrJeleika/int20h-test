@@ -50,7 +50,7 @@ const JoinProjectDialog = ({
         <DialogFooter>
           <Button
             disabled={!isValid || loading}
-            onClick={() => projectId && onSubmit(projectId)}
+            onClick={() => projectId != undefined && onSubmit(projectId)}
             type="submit"
           >
             {loading && <Loader2 className="animate-spin" />}

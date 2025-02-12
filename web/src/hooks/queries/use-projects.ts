@@ -2,11 +2,13 @@ import { useCallback, useMemo } from 'react';
 import { useReadContract } from 'wagmi';
 
 import abi from '@/lib/contractAbi';
+import { formatEther, parseEther } from 'viem';
 
 export type Project = {
   id: number;
   name: string;
   description: string;
+  reward: number;
   type: 'participated' | 'owned' | 'verification';
 };
 
@@ -32,6 +34,7 @@ export const useProjects = (sender?: string) => {
             type: 'participated',
             name: x.title,
             description: x.description,
+            reward: Number.parseFloat(formatEther(x.rewardAmount)),
           } as Project;
         }),
     },
@@ -54,6 +57,7 @@ export const useProjects = (sender?: string) => {
             type: 'owned',
             name: x.title,
             description: x.description,
+            reward: Number.parseFloat(formatEther(x.rewardAmount)),
           } as Project;
         }),
     },
@@ -76,6 +80,7 @@ export const useProjects = (sender?: string) => {
             type: 'verification',
             name: x.title,
             description: x.description,
+            reward: Number.parseFloat(formatEther(x.rewardAmount)),
           } as Project;
         }),
     },

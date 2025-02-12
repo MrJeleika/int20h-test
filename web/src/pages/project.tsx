@@ -88,10 +88,11 @@ export default function Project() {
 
   const navigate = useNavigate();
 
-  const { data: project, isLoading: projectLoading } = useProject(
-    accountInfo.address,
-    Number(id),
-  );
+  const {
+    data: project,
+    isLoading: projectLoading,
+    refetch: refetchProject,
+  } = useProject(accountInfo.address, Number(id));
   const {
     data: students,
     isLoading: studentsLoading,
@@ -211,6 +212,24 @@ export default function Project() {
     }
   }, [addStudentStatus]);
 
+  const { status: endProjectStatus, writeContractAsync: writeEndProject } =
+    useWriteContract();
+
+  const endProject = useCallback(async () => {
+    await writeEndProject({
+      abi: abi,
+      address: CONTRACT_ADDRESS,
+      functionName: 'endProject',
+      args: [BigInt(id ?? -1)],
+    });
+  }, [writeEndProject, id]);
+
+  useEffect(() => {
+    if (endProjectStatus === 'success') {
+      refetchProject();
+    }
+  }, [endProjectStatus]);
+
   useEffect(() => {
     if (page && elements.some((x) => x.id === page)) {
       setActivePage(page);
@@ -238,6 +257,8 @@ export default function Project() {
     }
   }, [activePage, page, id, navigate]);
 
+  const deadlinePassed = project ? project.endDate < new Date() : false;
+
   return (
     <ProjectNavbar
       activeElementId={activePage}
@@ -249,7 +270,13 @@ export default function Project() {
     >
       <div className="flex flex-1 flex-col gap-4 p-4">
         {activePage === 'info' && (
-          <Information projectData={project} loading={projectLoading} />
+          <Information
+            deadlinePassed={deadlinePassed}
+            isOwner={isOwner}
+            projectData={project}
+            loading={projectLoading}
+            endProject={endProject}
+          />
         )}
         {activePage === 'students' && (
           <>
@@ -299,6 +326,7 @@ export default function Project() {
               achievements={myAchievements ?? []}
               loading={myAchievementsLoading}
               setSubmitAchievementDialog={setAddAchievementModalActive}
+              deadlinePassed={deadlinePassed}
             ></MyAchievements>
             <SubmitAchievementDialog
               active={addAchievementModalActive}

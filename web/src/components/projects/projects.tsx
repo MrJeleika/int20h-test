@@ -28,7 +28,14 @@ const Projects = ({ projects, isLoading }: ProjectsProps) => {
                   <h2 className="text-lg font-semibold">{project.name}</h2>
                   <h3>{project.type}</h3>
                 </div>
-                <p className="text-sm text-gray-500">{project.description}</p>
+                <div className="flex align-top">
+                  <p className="w-[60%] text-sm text-gray-500">
+                    {project.description}
+                  </p>
+                  {project.reward > 0 && (
+                    <h3 className="ml-auto">{project.reward} ETH</h3>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))

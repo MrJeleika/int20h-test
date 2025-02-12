@@ -9,6 +9,7 @@ import { Achievement } from '@/hooks/queries/use-achievements';
 type MyAchievementsProps = {
   achievements: Achievement[];
   loading: boolean;
+  deadlinePassed: boolean;
   setSubmitAchievementDialog: (value: boolean) => void;
 };
 
@@ -44,15 +45,18 @@ const MyAchievements = ({
   achievements,
   setSubmitAchievementDialog,
   loading,
+  deadlinePassed,
 }: MyAchievementsProps) => {
   return (
     <div>
       <div className="mb-6 flex justify-between">
         <h1 className="text-2xl font-bold">My Achievements</h1>
-        <Button onClick={() => setSubmitAchievementDialog(true)}>
-          <Plus />
-          Submit achievement
-        </Button>
+        {deadlinePassed && (
+          <Button onClick={() => setSubmitAchievementDialog(true)}>
+            <Plus />
+            Submit achievement
+          </Button>
+        )}
       </div>
       <DataTable columns={columns} data={achievements} loading={loading} />
     </div>
