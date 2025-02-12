@@ -13,4 +13,5 @@ struct Project {
     address owner;
     bool isPublic;
     uint requiredVerificationsCount;
+    uint256 rewardAmount;
 }

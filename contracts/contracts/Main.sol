@@ -67,8 +67,10 @@ contract Main is ERC721 {
         _safeMint(student, _nextTokenId);
     }
 
-    function createProject(string memory title, string memory description, uint256 deadlineTimestamp, bool isPublic) public {
-        Project memory tempProject = Project(projectCounter, title, description, deadlineTimestamp, msg.sender, isPublic, 1);
+    function createProject(string memory title, string memory description, uint256 deadlineTimestamp, bool isPublic) public payable {
+        require(msg.value > 0, "You need to specify the reward amount");
+        
+        Project memory tempProject = Project(projectCounter, title, description, deadlineTimestamp, msg.sender, isPublic, 1, msg.value);
         projectVerifierExists[projectCounter][msg.sender] = true;
         projects.push(tempProject);
         myOwnedProjectsCount[msg.sender]++;
@@ -159,17 +161,7 @@ contract Main is ERC721 {
         StudentProjectInfo[] memory result = new StudentProjectInfo[](_students.length);
 
         for (uint i = 0; i < _students.length; i++) {
-            uint verified = 0;
-            Achievement memory tempAchievement;
-            for(uint j = 0; j < achievements.length; j++) {
-                tempAchievement = achievements[j];
-
-                if (tempAchievement.studentWallet == _students[i] && tempAchievement.isVerified) {
-                    verified++;
-                }
-            }
-
-            result[i] = StudentProjectInfo(_students[i], verified);
+            result[i] = StudentProjectInfo(_students[i], myVerifiedStudentAchievementsCountByProject[_students[i]][projectId]);
         }
 
         return result;
