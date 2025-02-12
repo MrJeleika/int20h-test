@@ -1,6 +1,7 @@
-import abi from '@/lib/contractAbi';
 import { useCallback, useMemo } from 'react';
 import { useReadContract } from 'wagmi';
+
+import abi from '@/lib/contractAbi';
 
 export type Achievement = {
   id: number;

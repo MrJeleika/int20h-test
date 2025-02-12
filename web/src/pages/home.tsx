@@ -1,6 +1,7 @@
 import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { Backpack, Plus } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { parseEther } from 'viem';
 import { useWriteContract } from 'wagmi';
 
 import CreateProjectDialog from '@/components/projects/create-project-dialog';
@@ -9,9 +10,8 @@ import Projects from '@/components/projects/projects';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { CreateProject } from '@/hooks/mutations/use-create-project';
-import abi from '@/lib/contractAbi';
 import { useProjects } from '@/hooks/queries/use-projects';
-import { parseEther } from 'viem';
+import abi from '@/lib/contractAbi';
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ID;
 export default function Home() {

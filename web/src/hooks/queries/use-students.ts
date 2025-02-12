@@ -1,6 +1,6 @@
-import abi from '@/lib/contractAbi';
-
 import { useReadContract } from 'wagmi';
+
+import abi from '@/lib/contractAbi';
 
 type Student = {
   wallet: string;

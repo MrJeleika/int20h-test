@@ -2,6 +2,7 @@ import { useAppKit, useAppKitAccount } from '@reown/appkit/react';
 import { BookType, GraduationCap, NotebookPen, UserCheck } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useWriteContract } from 'wagmi';
 
 import AddStudentDialog from '@/components/project/dialogs/add-student-dialog';
 import AddVerifierDialog from '@/components/project/dialogs/add-verifier-dialog';
@@ -19,9 +20,8 @@ import {
 import { useProject } from '@/hooks/queries/use-project';
 import { useStudents } from '@/hooks/queries/use-students';
 import { useVerifiers } from '@/hooks/queries/use-verifiers';
-import { routes } from '@/router';
-import { useWriteContract } from 'wagmi';
 import abi from '@/lib/contractAbi';
+import { routes } from '@/router';
 
 const publicElements = [
   {
@@ -137,7 +137,7 @@ export default function Project() {
       refetchMyAchievements();
       setAddAchievementModalActive(false);
     }
-  }, [postAchievementStatus]);
+  }, [postAchievementStatus, refetchMyAchievements]);
 
   const {
     writeContractAsync: writeVerifyAchievement,
@@ -160,7 +160,7 @@ export default function Project() {
     if (verifyAchievementStatus === 'success') {
       refetchAchievements();
     }
-  }, [verifyAchievementStatus]);
+  }, [verifyAchievementStatus, refetchAchievements]);
 
   const {
     writeContractAsync: writeAddVerifier,
@@ -185,7 +185,7 @@ export default function Project() {
       refetchVerifiers();
       setAddVerifierModalActive(false);
     }
-  }, [addVerifierStatus]);
+  }, [addVerifierStatus, refetchVerifiers]);
 
   const {
     writeContractAsync: writeAddStudent,
@@ -210,7 +210,7 @@ export default function Project() {
       refetchStudents();
       setAddStudentModalActive(false);
     }
-  }, [addStudentStatus]);
+  }, [addStudentStatus, refetchStudents]);
 
   const { status: endProjectStatus, writeContractAsync: writeEndProject } =
     useWriteContract();
@@ -228,7 +228,7 @@ export default function Project() {
     if (endProjectStatus === 'success') {
       refetchProject();
     }
-  }, [endProjectStatus]);
+  }, [endProjectStatus, refetchProject]);
 
   useEffect(() => {
     if (page && elements.some((x) => x.id === page)) {
@@ -249,7 +249,7 @@ export default function Project() {
         verifiers?.includes(accountInfo.address as `0x${string}`) ?? false,
       );
     }
-  }, [project?.owner, accountInfo.address]);
+  }, [project?.owner, accountInfo.address, verifiers]);
 
   useEffect(() => {
     if (activePage !== page) {

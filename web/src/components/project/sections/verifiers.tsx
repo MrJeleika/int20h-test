@@ -1,7 +1,8 @@
-import { Button } from '@/components/ui/button';
-import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { DataTable } from '@/components/ui/data-table';
 
 type VerifiersProps = {
   verifiers: string[];

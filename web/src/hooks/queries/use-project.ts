@@ -1,7 +1,7 @@
+import { formatEther } from 'viem';
 import { useReadContract } from 'wagmi';
 
 import abi from '@/lib/contractAbi';
-import { formatEther, parseEther } from 'viem';
 
 export type ProjectDetail = {
   id: number;
